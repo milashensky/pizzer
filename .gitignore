@@ -1,0 +1,17 @@
+package-lock.json
+*.pyc
+*~
+*.mo
+local_settings.py
+venv/*
+.idea
+.DS_Store
+/venv/
+/nginx/
+/storage/
+node_modules/
+assets/app.js*
+assets/*hot-update.j*
+.vscode
+yarn.lock
+/themes/themes/*/production/
