@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.contrib.auth import login
 from django.shortcuts import get_object_or_404
+from django.db import transaction
 
 from common.mixins import SerializedView
 from shop.models import Product
+from shop.forms import CreateOrderForm
 
 
 class ProductApi(SerializedView):
@@ -25,3 +28,21 @@ class CategoryApi(SerializedView):
 
     def get(self, request):
         return Product.objects.all()
+
+
+class OrderApi(SerializedView):
+
+    @transaction.atomic
+    def post(self, request):
+        self.data['user'] = request.user
+        self.data['currency'] = 840
+        sid = transaction.savepoint()
+        form = CreateOrderForm(self.data)
+        if form.is_valid():
+            order = form.save()
+            transaction.savepoint_commit(sid)
+            if not request.user.is_authenticated and form.data.get('user_created'):
+                login(request, order.customer.user)
+            return {'state': True, 'id': order.id}
+        transaction.savepoint_rollback(sid)
+        return {'state': False, 'errors': form.errors}

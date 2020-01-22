@@ -1,31 +1,18 @@
 # -*- coding: utf-8 -*-
 import pytils
-
 from django.db import models
+
+from common.mixins import SerializedView
 from common.fields import JsonField
 
 
-class Currency(models.Model):
-    id = models.PositiveSmallIntegerField('ISO numeric', primary_key=True)
-    code = models.CharField('Code (ISO)', max_length=4)
-    name = models.CharField('Official name (CAPS)', max_length=128)
-    symbol = models.CharField('Symbol', max_length=3, null=True, blank=True)
-    is_active = models.BooleanField(default=True)
-    rate = models.FloatField(default=1.0)
-    precision = models.PositiveSmallIntegerField(default=100)
+PAYMENT_CASH = 0
+PAYMENT_CARD = 1
 
-    class Meta:
-        ordering = ('code', )
-        verbose_name_plural = 'Currencies'
-
-    def __str__(self):
-        return u'%s' % self.code
-
-    def humanize(self, amount):
-        return amount and (float(amount) / self.precision)
-
-    def unhumanize(self, amount):
-        return amount and (float(amount) * self.precision)
+PAYMENT_METHODS = (
+    (PAYMENT_CASH, 'Cash'),
+    (PAYMENT_CARD, 'Card')
+)
 
 
 class ProductCategory(models.Model):
@@ -74,7 +61,15 @@ class Product(models.Model):
 class ProductOrder(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="orders")
-    order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name="products")
+    order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name="products", null=True)
+
+    @property
+    def serialized(self):
+        fields = ('id', 'slug', 'name', 'description', 'currency_id', 'price')
+        return {'quantity': self.quantity, **SerializedView.serialize_item(self.product, fields)}
+
+    def __str__(self):
+        return '%s: %s' % (self.product_id, self.quantity)
 
 
 class Order(models.Model):
@@ -83,13 +78,15 @@ class Order(models.Model):
     products_data = JsonField(default=[])
     details = models.TextField(blank=True, null=True)
     currency = models.ForeignKey('catalogue.Currency', default=840, on_delete=models.CASCADE)
-    products_price = models.BigIntegerField(null=True)
+    products_price = models.BigIntegerField()
     # with delivery
-    total_price = models.BigIntegerField(null=True)
-
+    total_price = models.BigIntegerField()
     delivery_address = models.ForeignKey('common.DeliveryAddress', null=True, on_delete=models.SET_NULL)
     # for nonauthtorized users
     delivery_data = JsonField(null=True)
-
+    payment_method = models.PositiveSmallIntegerField(choices=PAYMENT_METHODS)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return '%s: %s as %s' % (self.customer_id, self.customer_data.get('name'), self.created_at)
