@@ -14,6 +14,7 @@ DEBUG_TOOLBAR = False
 ALLOWED_HOSTS = ['*']
 ANONYMOUS_USER_ID = -1
 
+
 SERIALIZATION_MODULES = {
     'json': 'common.json'
 }

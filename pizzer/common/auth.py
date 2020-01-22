@@ -2,7 +2,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
-from common.mixins import CsrfExemptMixin, SerializedView
+from common.mixins import SerializedView
 
 
 class LoginApi(SerializedView):
@@ -17,7 +17,7 @@ class LoginApi(SerializedView):
         return {'errors': ['Incorrect email or password']}
 
 
-class LogoutApi(CsrfExemptMixin, SerializedView):
+class LogoutApi(SerializedView):
 
     def post(self, request):
         logout(self.request)

@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.contrib.auth import login
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 
@@ -31,6 +32,16 @@ class CategoryApi(SerializedView):
 
 
 class OrderApi(SerializedView):
+    fields = ('id', 'delivery_data', 'customer_data', 'products_data', 'created_at', 'currency_id:currency', 'total_price', 'products_price')
+
+    def get(self, request):
+        if request.user.is_authenticated and hasattr(request.user, 'customer'):
+            page = int(request.GET.get('page', 0))
+            per_page = int(request.GET.get('per_page', 20))
+            current = page * per_page
+            qs = request.user.customer.orders.all().order_by('-created_at')
+            return {'orders': self.serialize_items(qs[current:current + per_page], self.fields), 'total': qs.count()}
+        raise PermissionDenied
 
     @transaction.atomic
     def post(self, request):

@@ -1,5 +1,4 @@
 import logging
-import re
 
 from django import forms
 from django.contrib.auth.models import User
@@ -7,12 +6,13 @@ from django.contrib.auth.models import User
 from shop.models import Order, ProductOrder, Product
 from common.models import Customer, DeliveryAddress
 from common.utils import create_temporary_user
+from common.forms import PhoneValidator
 from shop.utils import convert_price, get_delivery_price
 
 logger = logging.getLogger(__name__)
 
 
-class CreateOrderForm(forms.ModelForm):
+class CreateOrderForm(forms.ModelForm, PhoneValidator):
     address = forms.CharField(required=True)
     house = forms.CharField(required=True)
     appartaments = forms.CharField(required=True)
@@ -121,12 +121,6 @@ class CreateOrderForm(forms.ModelForm):
         self.cleaned_data['delivery_data'] = address
         self.cleaned_data['delivery_address'] = customer.delivery_address
         return customer.delivery_address
-
-    def clean_phone(self):
-        phone = self.cleaned_data.get('phone', '')
-        if not re.match(r'^\+?[-\s]?\(?[0-9]{1,2}\)?[-\s]?\(?([0-9]{3,4})\)?[-.\s]?([0-9]{2,3})[-.\s]?([0-9]{2,4})[-.\s]?([0-9]{2})?$', phone):
-            raise forms.ValidationError('Invalid phone number')
-        return phone
 
     def save(self):
         res = super().save()

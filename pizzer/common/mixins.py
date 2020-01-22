@@ -9,7 +9,6 @@ from django.http import HttpResponse
 from django.core.serializers import serialize
 from django.core.exceptions import PermissionDenied
 from django.http.response import HttpResponseNotAllowed
-from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 from django.db.models.query import QuerySet
 from django.db.models.fields.files import ImageFieldFile
@@ -21,7 +20,7 @@ logger = logging.getLogger(__name__)
 class AuthRequierdMixin:
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
+        if request.user.is_authenticated and hasattr(request.user, 'customer'):
             return super().dispatch(request, *args, **kwargs)
         raise PermissionDenied
 
@@ -61,20 +60,11 @@ class JsonResponseMixin(object):
         return JsonResponse(context, status=self.status)
 
 
-class CsrfExemptMixin(object):
-
-    @csrf_exempt
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-
 class SerializedView(JsonResponseMixin, View):
     data = {}
     without_null = False
 
-    @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
-        # TODO: check permision by group via self.groups
         if not self.data:
             self.data = json.loads(request.body.decode('utf-8') or '{}')
         self.filter_data = {}
