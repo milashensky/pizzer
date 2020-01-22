@@ -1,5 +1,7 @@
-from common.mixins import SerializedView, AuthRequierdMixin
 from django.contrib.auth.models import User
+
+from common.mixins import SerializedView, AuthRequierdMixin
+from catalogue.models import Currency
 
 
 class ContextApi(SerializedView):
@@ -9,12 +11,21 @@ class ContextApi(SerializedView):
         data = {
             'id': user.pk
         }
-        if user.pk:
+        if user.pk and hasattr(user, 'customer'):
             data.update({
                 'email': user.email,
                 'username': user.username,
+                'currency': user.customer.currency_id
             })
         return data
+
+    def patch(self, request):
+        if request.user.pk and hasattr(request.user, 'customer'):
+            request.user.customer.currency = Currency.objects.get(pk=self.data.get('currency'))
+            request.user.customer.save()
+            return {'state': True}
+        self.status = 400
+        return {'state': False}
 
 
 class Users(AuthRequierdMixin, SerializedView):

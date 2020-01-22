@@ -9,6 +9,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/common/', include(('common.urls', 'common'), namespace='common')),
     path('api/shop/', include(('shop.urls', 'shop'), namespace='shop')),
+    path('api/catalogue/', include(('catalogue.urls', 'catalogue'), namespace='catalogue')),
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT, 'show_indexes': False}),
 ]
 

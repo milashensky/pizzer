@@ -95,7 +95,7 @@ class CreateOrderForm(forms.ModelForm):
         if currency:
             for product_id, quantity in products:
                 product = Product.objects.get(id=product_id)
-                products_price += convert_price(product.price, currency, product.currency)
+                products_price += convert_price(product.price, currency, product.currency) * int(quantity)
                 order = ProductOrder.objects.create(product=product, quantity=quantity)
                 orders.append(order)
                 products_data.append(order.serialized)

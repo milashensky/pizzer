@@ -35,7 +35,6 @@ class OrderApi(SerializedView):
     @transaction.atomic
     def post(self, request):
         self.data['user'] = request.user
-        self.data['currency'] = 840
         sid = transaction.savepoint()
         form = CreateOrderForm(self.data)
         if form.is_valid():

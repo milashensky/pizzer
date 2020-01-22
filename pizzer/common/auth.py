@@ -34,5 +34,4 @@ class RegistrationApi(SerializedView):
             user.save()
             login(self.request, user)
             return {'id': user.id}
-        self.status = 400
         return {'errors': form.errors}
