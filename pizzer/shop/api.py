@@ -7,12 +7,12 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 
 from common.mixins import SerializedView
-from shop.models import Product
+from shop.models import Product, ProductCategory
 from shop.forms import CreateOrderForm
 
 
 class ProductApi(SerializedView):
-    fields = ('id', 'slug', 'name', 'description', 'price', 'currency_id:currency', 'main_photo__photo__url:preview')
+    fields = ('id', 'slug', 'name', 'description', 'price', 'currency_id:currency', 'main_photo__photo__url:preview', 'category_id:category')
 
     def get_item(self, slug):
         self.fields = self.fields + ({'photos': ('photo__url:url', 'id')}, )
@@ -21,14 +21,14 @@ class ProductApi(SerializedView):
     def get(self, request, slug=None):
         if slug:
             return self.get_item(slug)
-        return Product.objects.all()
+        return Product.objects.all().order_by('id')
 
 
 class CategoryApi(SerializedView):
-    fields = ('id', 'name', 'logo__photo__url:preview')
+    fields = ('id', 'name', 'logo__photo__url:logo')
 
     def get(self, request):
-        return Product.objects.all()
+        return ProductCategory.objects.all()
 
 
 class OrderApi(SerializedView):
