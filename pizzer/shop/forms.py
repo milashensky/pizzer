@@ -50,9 +50,9 @@ class CreateOrderForm(forms.ModelForm, PhoneValidator):
                 user = User.objects.filter(email=email).first()
                 if not user:
                     user = create_temporary_user(email)
-            if user.last_name is not name:
-                user.last_name = name
-                user.save()
+        if user.last_name is not name:
+            user.last_name = name
+            user.save()
         customer, cr = Customer.objects.get_or_create(user=user)
         ch = False
         if customer.currency_id is not currency.id:

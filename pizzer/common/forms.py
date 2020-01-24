@@ -27,7 +27,7 @@ class CustomerForm(forms.ModelForm, PhoneValidator):
 
     def save(self):
         self.instance.user.email = self.cleaned_data.get('email')
-        self.instance.user.name = self.cleaned_data.get('name')
+        self.instance.user.last_name = self.cleaned_data.get('name')
         self.instance.user.save()
         return super().save()
 
