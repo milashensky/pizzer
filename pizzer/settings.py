@@ -64,7 +64,7 @@ AUTHENTICATION_BACKENDS = (
     # 'social_core.backends.facebook.FacebookOAuth2',
     # 'social_core.backends.google.GoogleOAuth2',
     # 'social_core.backends.odnoklassniki.OdnoklassnikiOAuth2',
-    'django.contrib.auth.backends.AllowAllUsersRemoteUserBackend',
+    'common.backends.UserModelBackend',
 )
 
 WSGI_APPLICATION = 'pizzer.wsgi.application'

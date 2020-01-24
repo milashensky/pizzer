@@ -1,0 +1,3 @@
+[submodule "pizzer-client"]
+	path = pizzer-client
+	url = git@github.com:milashensky/pizzer-client.git
