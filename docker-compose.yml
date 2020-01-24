@@ -18,9 +18,9 @@ services:
     build: .
     command: bash -c "rm -f /shared/.migration.done; make && touch /shared/.migration.done"
     environment:
-        DBNAME: nD4RAXJUwn
-        DBUSER: nD4RAXJUwn
-        DBPASS: oFAOx4T9mk
+        DBNAME: ${DBNAME}
+        DBUSER: ${DBNAME}
+        DBPASS: ${DBNAME}
     volumes:
       - .:/work
       - shared:/shared
