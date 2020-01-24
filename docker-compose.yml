@@ -14,22 +14,22 @@ services:
       - "443:443"
     volumes:
       - .:/work
-  # migration:
-  #   build: .
-  #   command: bash -c "rm -f /shared/.migration.done; make && touch /shared/.migration.done"
-  #   environment:
-  #       DBNAME: nD4RAXJUwn
-  #       DBUSER: nD4RAXJUwn
-  #       DBPASS: oFAOx4T9mk
-  #   volumes:
-  #     - .:/work
-  #     - shared:/shared
+  migration:
+    build: .
+    command: bash -c "rm -f /shared/.migration.done; make && touch /shared/.migration.done"
+    environment:
+        DBNAME: nD4RAXJUwn
+        DBUSER: nD4RAXJUwn
+        DBPASS: oFAOx4T9mk
+    volumes:
+      - .:/work
+      - shared:/shared
   runserver:
     container_name: api-container
     restart: always
     build: .
     command: uwsgi --ini wsgi.ini
-    # entrypoint: /work/entrypoint.sh
+    entrypoint: /work/entrypoint.sh
     environment:
         DBNAME: ${DBNAME}
         DBUSER: ${DBUSER}
@@ -39,8 +39,8 @@ services:
       - shared:/shared
     ports:
       - "18000:8000"
-    # depends_on:
-    #   - migration
+    depends_on:
+      - migration
 
 volumes:
     shared:
