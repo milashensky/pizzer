@@ -16,7 +16,7 @@ PAYMENT_METHODS = (
 
 
 class ProductCategory(models.Model):
-    name = models.CharField(max_length=350, unique=True)
+    name = models.CharField(max_length=250, unique=True)
     logo = models.OneToOneField('catalogue.Photo', related_name="category_logo", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 

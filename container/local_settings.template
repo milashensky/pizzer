@@ -1,0 +1,17 @@
+import os
+import settings
+
+DEBUG = False
+DEBUG_TOOLBAR = False
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ["DBNAME"],
+        'USER': os.environ["DBUSER"],
+        'PASSWORD': os.environ["DBPASS"],
+        'HOST': 'remotemysql.com',
+        'PORT': '3306',
+    }
+}

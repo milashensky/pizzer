@@ -1,0 +1,46 @@
+version: '2.1'
+
+services:
+  nginx:
+    restart: always
+    build: ./container/nginx
+    command: /bin/bash -c "envsubst < /etc/config.template > /etc/nginx/conf.d/pizzer.conf && exec nginx -g 'daemon off;'"
+    environment:
+        PORT: ${PORT}
+        HOST: ${HOST}
+        ESC: $$
+    ports:
+      - "8000:8000"
+      - "443:443"
+    volumes:
+      - .:/work
+  # migration:
+  #   build: .
+  #   command: bash -c "rm -f /shared/.migration.done; make && touch /shared/.migration.done"
+  #   environment:
+  #       DBNAME: nD4RAXJUwn
+  #       DBUSER: nD4RAXJUwn
+  #       DBPASS: oFAOx4T9mk
+  #   volumes:
+  #     - .:/work
+  #     - shared:/shared
+  runserver:
+    container_name: api-container
+    restart: always
+    build: .
+    command: uwsgi --ini wsgi.ini
+    # entrypoint: /work/entrypoint.sh
+    environment:
+        DBNAME: ${DBNAME}
+        DBUSER: ${DBUSER}
+        DBPASS: ${DBPASS}
+    volumes:
+      - .:/work
+      - shared:/shared
+    ports:
+      - "18000:8000"
+    # depends_on:
+    #   - migration
+
+volumes:
+    shared:
